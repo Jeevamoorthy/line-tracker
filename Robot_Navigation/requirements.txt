@@ -1,0 +1,6 @@
+# Core image processing and array math
+numpy>=1.21.0
+opencv-python>=4.5.5
+
+# Optional: For performance logging and CSV exports
+pandas>=1.3.0

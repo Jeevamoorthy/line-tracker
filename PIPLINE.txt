@@ -1,0 +1,22 @@
+STEP 1: SPATIAL REDUCTION (ROI)
+Instead of processing 76,800 pixels (320x240), we process a strip of 
+320x40 (12,800 pixels). This 83% reduction in data drastically 
+reduces CPU interrupts and cache misses.
+
+STEP 2: FEATURE EXTRACTION (HSV MOMENTS)
+We avoid 'findContours' because it is an O(N) operation that builds 
+a tree structure of points. 'Moments' (M00, M10) are simple weighted 
+summations of pixel intensities. This is mathematically cheaper 
+and can be easily accelerated by NEON (on Jetson CPU) or CUDA.
+
+STEP 3: TEMPORAL STABILITY (PID)
+A high-speed robot cannot rely on raw error values (Line Center - Image Center). 
+The 'D' (Derivative) component of our PID predicts the line's path, 
+allowing the robot to decelerate its rotation BEFORE it overshoots 
+the line, enabling higher safe velocities.
+
+STEP 4: DEPLOYMENT READY
+The code uses a standard 'VideoCapture' interface. To move to Jetson Nano:
+- Swap the 'cv2.VideoCapture' index for a GStreamer string.
+- The use of 'numpy' arrays for masking is compatible with 
+  OpenCV's Transparent API (UMat), allowing for easy GPU offloading if needed.
